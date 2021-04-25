@@ -1,15 +1,15 @@
-var greekLetterNames = [ 'Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega' ];
+var greekLetterNames = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda', 'Mu', 'Nu', 'Xi', 'Omicron', 'Pi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi', 'Psi', 'Omega'];
 
 function convertLatexShortcuts(text) {
 	// html greek characters
-	for(var i = 0; i < greekLetterNames.length; i++) {
+	for (var i = 0; i < greekLetterNames.length; i++) {
 		var name = greekLetterNames[i];
 		text = text.replace(new RegExp('\\\\' + name, 'g'), String.fromCharCode(913 + i + (i > 16)));
 		text = text.replace(new RegExp('\\\\' + name.toLowerCase(), 'g'), String.fromCharCode(945 + i + (i > 16)));
 	}
 
 	// subscripts
-	for(var i = 0; i < 10; i++) {
+	for (var i = 0; i < 10; i++) {
 		text = text.replace(new RegExp('_' + i, 'g'), String.fromCharCode(8320 + i));
 	}
 
@@ -19,9 +19,9 @@ function convertLatexShortcuts(text) {
 function textToXML(text) {
 	text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	var result = '';
-	for(var i = 0; i < text.length; i++) {
+	for (var i = 0; i < text.length; i++) {
 		var c = text.charCodeAt(i);
-		if(c >= 0x20 && c <= 0x7E) {
+		if (c >= 0x20 && c <= 0x7E) {
 			result += text[i];
 		} else {
 			result += '&#' + c + ';';
@@ -53,7 +53,7 @@ function drawText(c, originalText, x, y, angleOrNull, isSelected) {
 	x -= width / 2;
 
 	// position the text intelligently if given an angle
-	if(angleOrNull != null) {
+	if (angleOrNull != null) {
 		var cos = Math.cos(angleOrNull);
 		var sin = Math.sin(angleOrNull);
 		var cornerPointX = (width / 2 + 5) * (cos > 0 ? 1 : -1);
@@ -64,13 +64,13 @@ function drawText(c, originalText, x, y, angleOrNull, isSelected) {
 	}
 
 	// draw text and caret (round the coordinates so the caret falls on a pixel)
-	if('advancedFillText' in c) {
+	if ('advancedFillText' in c) {
 		c.advancedFillText(text, originalText, x + width / 2, y, angleOrNull);
 	} else {
 		x = Math.round(x);
 		y = Math.round(y);
 		c.fillText(text, x, y + 6);
-		if(isSelected && caretVisible && canvasHasFocus() && document.hasFocus()) {
+		if (isSelected && caretVisible && canvasHasFocus() && document.hasFocus()) {
 			x += width;
 			c.beginPath();
 			c.moveTo(x, y - 10);
@@ -107,17 +107,17 @@ function drawUsing(c) {
 	c.save();
 	c.translate(0.5, 0.5);
 
-	for(var i = 0; i < nodes.length; i++) {
+	for (var i = 0; i < nodes.length; i++) {
 		c.lineWidth = 1;
 		c.fillStyle = c.strokeStyle = (nodes[i] == selectedObject) ? 'blue' : 'black';
 		nodes[i].draw(c);
 	}
-	for(var i = 0; i < links.length; i++) {
+	for (var i = 0; i < links.length; i++) {
 		c.lineWidth = 1;
 		c.fillStyle = c.strokeStyle = (links[i] == selectedObject) ? 'blue' : 'black';
 		links[i].draw(c);
 	}
-	if(currentLink != null) {
+	if (currentLink != null) {
 		c.lineWidth = 1;
 		c.fillStyle = c.strokeStyle = 'black';
 		currentLink.draw(c);
@@ -132,13 +132,13 @@ function draw() {
 }
 
 function selectObject(x, y) {
-	for(var i = 0; i < nodes.length; i++) {
-		if(nodes[i].containsPoint(x, y)) {
+	for (var i = 0; i < nodes.length; i++) {
+		if (nodes[i].containsPoint(x, y)) {
 			return nodes[i];
 		}
 	}
-	for(var i = 0; i < links.length; i++) {
-		if(links[i].containsPoint(x, y)) {
+	for (var i = 0; i < links.length; i++) {
+		if (links[i].containsPoint(x, y)) {
 			return links[i];
 		}
 	}
@@ -146,48 +146,48 @@ function selectObject(x, y) {
 }
 
 function snapNode(node) {
-	for(var i = 0; i < nodes.length; i++) {
-		if(nodes[i] == node) continue;
+	for (var i = 0; i < nodes.length; i++) {
+		if (nodes[i] == node) continue;
 
-		if(Math.abs(node.x - nodes[i].x) < snapToPadding) {
+		if (Math.abs(node.x - nodes[i].x) < snapToPadding) {
 			node.x = nodes[i].x;
 		}
 
-		if(Math.abs(node.y - nodes[i].y) < snapToPadding) {
+		if (Math.abs(node.y - nodes[i].y) < snapToPadding) {
 			node.y = nodes[i].y;
 		}
 	}
 }
 
-window.onload = function() {
+window.onload = function () {
 	canvas = document.getElementById('canvas');
 	restoreBackup();
 	draw();
 
-	canvas.onmousedown = function(e) {
+	canvas.onmousedown = function (e) {
 		var mouse = crossBrowserRelativeMousePos(e);
 		selectedObject = selectObject(mouse.x, mouse.y);
 		movingObject = false;
 		originalClick = mouse;
 
-		if(selectedObject != null) {
-			if(shift && selectedObject instanceof Node) {
+		if (selectedObject != null) {
+			if (shift && selectedObject instanceof Node) {
 				currentLink = new SelfLink(selectedObject, mouse);
 			} else {
 				movingObject = true;
 				deltaMouseX = deltaMouseY = 0;
-				if(selectedObject.setMouseStart) {
+				if (selectedObject.setMouseStart) {
 					selectedObject.setMouseStart(mouse.x, mouse.y);
 				}
 			}
 			resetCaret();
-		} else if(shift) {
+		} else if (shift) {
 			currentLink = new TemporaryLink(mouse, mouse);
 		}
 
 		draw();
 
-		if(canvasHasFocus()) {
+		if (canvasHasFocus()) {
 			// disable drag-and-drop only if the canvas is already focused
 			return false;
 		} else {
@@ -197,40 +197,40 @@ window.onload = function() {
 		}
 	};
 
-	canvas.ondblclick = function(e) {
+	canvas.ondblclick = function (e) {
 		var mouse = crossBrowserRelativeMousePos(e);
 		selectedObject = selectObject(mouse.x, mouse.y);
 
-		if(selectedObject == null) {
+		if (selectedObject == null) {
 			selectedObject = new Node(mouse.x, mouse.y);
 			nodes.push(selectedObject);
 			resetCaret();
 			draw();
-		} else if(selectedObject instanceof Node) {
+		} else if (selectedObject instanceof Node) {
 			selectedObject.isAcceptState = !selectedObject.isAcceptState;
 			draw();
 		}
 	};
 
-	canvas.onmousemove = function(e) {
+	canvas.onmousemove = function (e) {
 		var mouse = crossBrowserRelativeMousePos(e);
 
-		if(currentLink != null) {
+		if (currentLink != null) {
 			var targetNode = selectObject(mouse.x, mouse.y);
-			if(!(targetNode instanceof Node)) {
+			if (!(targetNode instanceof Node)) {
 				targetNode = null;
 			}
 
-			if(selectedObject == null) {
-				if(targetNode != null) {
+			if (selectedObject == null) {
+				if (targetNode != null) {
 					currentLink = new StartLink(targetNode, originalClick);
 				} else {
 					currentLink = new TemporaryLink(originalClick, mouse);
 				}
 			} else {
-				if(targetNode == selectedObject) {
+				if (targetNode == selectedObject) {
 					currentLink = new SelfLink(selectedObject, mouse);
-				} else if(targetNode != null) {
+				} else if (targetNode != null) {
 					currentLink = new Link(selectedObject, targetNode);
 				} else {
 					currentLink = new TemporaryLink(selectedObject.closestPointOnCircle(mouse.x, mouse.y), mouse);
@@ -239,20 +239,20 @@ window.onload = function() {
 			draw();
 		}
 
-		if(movingObject) {
+		if (movingObject) {
 			selectedObject.setAnchorPoint(mouse.x, mouse.y);
-			if(selectedObject instanceof Node) {
+			if (selectedObject instanceof Node) {
 				snapNode(selectedObject);
 			}
 			draw();
 		}
 	};
 
-	canvas.onmouseup = function(e) {
+	canvas.onmouseup = function (e) {
 		movingObject = false;
 
-		if(currentLink != null) {
-			if(!(currentLink instanceof TemporaryLink)) {
+		if (currentLink != null) {
+			if (!(currentLink instanceof TemporaryLink)) {
 				selectedObject = currentLink;
 				links.push(currentLink);
 				resetCaret();
@@ -265,16 +265,16 @@ window.onload = function() {
 
 var shift = false;
 
-document.onkeydown = function(e) {
+document.onkeydown = function (e) {
 	var key = crossBrowserKey(e);
 
-	if(key == 16) {
+	if (key == 16) {
 		shift = true;
-	} else if(!canvasHasFocus()) {
+	} else if (!canvasHasFocus()) {
 		// don't read keystrokes when other things have focus
 		return true;
-	} else if(key == 8) { // backspace key
-		if(selectedObject != null && 'text' in selectedObject) {
+	} else if (key == 8) { // backspace key
+		if (selectedObject != null && 'text' in selectedObject) {
 			selectedObject.text = selectedObject.text.substr(0, selectedObject.text.length - 1);
 			resetCaret();
 			draw();
@@ -282,15 +282,15 @@ document.onkeydown = function(e) {
 
 		// backspace is a shortcut for the back button, but do NOT want to change pages
 		return false;
-	} else if(key == 46) { // delete key
-		if(selectedObject != null) {
-			for(var i = 0; i < nodes.length; i++) {
-				if(nodes[i] == selectedObject) {
+	} else if (key == 46) { // delete key
+		if (selectedObject != null) {
+			for (var i = 0; i < nodes.length; i++) {
+				if (nodes[i] == selectedObject) {
 					nodes.splice(i--, 1);
 				}
 			}
-			for(var i = 0; i < links.length; i++) {
-				if(links[i] == selectedObject || links[i].node == selectedObject || links[i].nodeA == selectedObject || links[i].nodeB == selectedObject) {
+			for (var i = 0; i < links.length; i++) {
+				if (links[i] == selectedObject || links[i].node == selectedObject || links[i].nodeA == selectedObject || links[i].nodeB == selectedObject) {
 					links.splice(i--, 1);
 				}
 			}
@@ -300,28 +300,28 @@ document.onkeydown = function(e) {
 	}
 };
 
-document.onkeyup = function(e) {
+document.onkeyup = function (e) {
 	var key = crossBrowserKey(e);
 
-	if(key == 16) {
+	if (key == 16) {
 		shift = false;
 	}
 };
 
-document.onkeypress = function(e) {
+document.onkeypress = function (e) {
 	// don't read keystrokes when other things have focus
 	var key = crossBrowserKey(e);
-	if(!canvasHasFocus()) {
+	if (!canvasHasFocus()) {
 		// don't read keystrokes when other things have focus
 		return true;
-	} else if(key >= 0x20 && key <= 0x7E && !e.metaKey && !e.altKey && !e.ctrlKey && selectedObject != null && 'text' in selectedObject) {
+	} else if (key >= 0x20 && key <= 0x7E && !e.metaKey && !e.altKey && !e.ctrlKey && selectedObject != null && 'text' in selectedObject) {
 		selectedObject.text += String.fromCharCode(key);
 		resetCaret();
 		draw();
 
 		// don't let keys do their actions (like space scrolls down the page)
 		return false;
-	} else if(key == 8) {
+	} else if (key == 8) {
 		// backspace is a shortcut for the back button, but do NOT want to change pages
 		return false;
 	}
@@ -336,7 +336,7 @@ function crossBrowserElementPos(e) {
 	e = e || window.event;
 	var obj = e.target || e.srcElement;
 	var x = 0, y = 0;
-	while(obj.offsetParent) {
+	while (obj.offsetParent) {
 		x += obj.offsetLeft;
 		y += obj.offsetTop;
 		obj = obj.offsetParent;
@@ -396,4 +396,22 @@ function saveAsLaTeX() {
 	selectedObject = oldSelectedObject;
 	var texData = exporter.toLaTeX();
 	output(texData);
+}
+
+const clearCanvas = () => {
+	localStorage['fsm'] = '';
+	nodes = [];
+	links = [];
+	draw();
+
+}
+
+const clearNodes = () => {
+	for (var i = 0; i < nodes.length; i++) {
+		nodes[i].text = '';
+	}
+	for (var i = 0; i < links.length; i++) {
+		links[i].text = '';
+	}
+	draw();
 }
