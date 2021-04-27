@@ -41,6 +41,7 @@ const updateFsmListLoad = () => {
 
 const addFSM = () => {
 	fsmList.push({ name: `fsm_${fsmList.length}`, content: null });
+	currentFsm = fsmList.length - 1;
 	updateFsmListLoad();
 	clearCanvas();
 }
